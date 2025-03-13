@@ -44,7 +44,9 @@
     // Substitui o ficheiro original pelo corrigido
 } */
 
-void ficheiroMemoria(char vetor[][50], int *numPalavras) {
+void ficheiroMemoria(char **vetor, int *numPalavras)
+{
+
     FILE *ficheiro = fopen("words", "r");
     if (!ficheiro)
     {
@@ -57,23 +59,28 @@ void ficheiroMemoria(char vetor[][50], int *numPalavras) {
     long ficheiroTamanho = ftell(ficheiro);
     rewind(ficheiro);
     */
-    //Calcula o tamanho do ficheiro e volta ao inicio do ficheiro
+    // char **vetor = (char *)realloc(ficheiroTamanho + 1);
 
-     //char *vetor = (char *)malloc(ficheiroTamanho + 1);
+    //*char=char[]
+    //**char=*char[]=char[][]
+    // Calcula o tamanho do ficheiro e volta ao inicio do ficheiro
 
-      
-      //Associa uma memoria dinamicamente ao vetor
-     //fread(vetor, 1, 104335, ficheiro);
+    // char *vetor = (char *)malloc(ficheiroTamanho + 1);
 
-    char palavra[40];
-    *numPalavras = 0;
-     while (fscanf(ficheiro, "%39s", palavra) == 1)
+    // Associa uma memoria dinamicamente ao vetor
+    // fread(vetor, 1, 104335, ficheiro);
+
+    printf("num %d\n", *numPalavras);
+    char palavra[50];
+    while (fscanf(ficheiro, "%49s", palavra) == 1)
     {
-     strcpy(vetor[*numPalavras], palavra);
-    (*numPalavras) ++;
+        vetor[*numPalavras] = (char *)malloc(strlen(palavra) + 1);
+        strcpy(vetor[*numPalavras], palavra);
+        (*numPalavras)++;
     }
     fclose(ficheiro);
-    //Le o ficheiro, coloca o conteudo ao vetor e fecha o ficheiro
+
+    // Le o ficheiro, coloca o conteudo ao vetor e fecha o ficheiro
 }
 /*
 char **read_names_from_file(const char *filename, int *count)
@@ -167,8 +174,56 @@ void formalizarPalavras(char palavras[])
     }
 }
 
+void formalizarDicionario(char **vetor, int tamanho)
+{
+    for (int i = 0; i < tamanho; i++)
+    {
+        char *palavras = vetor[i];
+        while (*palavras)
+        {
+            if (*palavras >= 'A' && *palavras <= 'Z')
+            {
+                *palavras += 32;
+            }
+            palavras++;
+        }
+    }
+}
+
+void compararPalavras(char palavras[], char **vetor, int numPalavras)
+{
+    int resultado = 0;
+
+    printf("我看看 %d\n", numPalavras);
+    for (int i = 0; i < numPalavras; i++)
+    {
+        // printf("hello\n");
+        // printf("%s\n", palavras);
+    }
+
+    for (int i = 0; i < numPalavras; i++)
+    {
+        // Comparar as palavras
+        if (strcasecmp(palavras, vetor[i]) == 0)
+        {
+            resultado = 1;
+            break;
+        }
+    }
+
+    if (resultado == 1)
+    {
+        printf("A palavra existe no dicionario\n");
+    }
+    else
+    {
+        printf("A palavra %s nao existe no dicionario\n", palavras);
+    }
+    // Compara as palavras
+}
+
 // Separar as palavras da frase
-void separarPalavras(char frase[])
+void separarPalavras(char frase[], char **vetor, int tamanho)
 {
     char sinalSeparação[] = " \t\r\n/";
     char *palavras = strtok(frase, sinalSeparação);
@@ -176,49 +231,47 @@ void separarPalavras(char frase[])
     while (palavras != NULL)
     {
         formalizarPalavras(palavras); // chama a função para limpar as palavras
-        printf("%s\n", palavras);
+        // printf("%s\n", palavras);
+        printf("让我看看 %s", palavras);
+        compararPalavras(palavras, vetor, tamanho);
         palavras = strtok(NULL, sinalSeparação);
     }
 }
 
-void compararPalavras(char palavras[], char vetor[])
-{
-    for (int i = 0; i < strlen(palavras); i++)
-    {
-        // Comparar as palavras
-        if (palavras[i] != vetor[i])
-        {
-            printf("As palavras nao são iguais\n");
-        }
-    }
-    // Compara as palavras
-}
-
 int main()
 {
-    int tamanho;
+    int *tamanho;
     char frase[300];
     char fraseCopia[300];
-    char vetor[104335][50];
-    // int numPalavras;
-    //char **vetor = read_names_from_file("words", &tamanho);
+    char **vetor = (char **)malloc(104335 * sizeof(char *));
 
-    ficheiroMemoria(vetor, &tamanho);
+    *tamanho = 0;
 
-    for (int i = 0; i < 20; i++)
+    ficheiroMemoria(vetor, tamanho);
+
+    for (int i = 0; i < 1; i++)
     {
-        printf("%s\n", vetor[i]);
+        printf("%d %s\n", i + 1, vetor[i]);
     }
+
     printf("Insere a frase\n");
     fgets(frase, sizeof(frase), stdin); // ler a frase
 
-    // printf("%d\n", strlen(frase));
     strcpy(fraseCopia, frase);
 
-    separarPalavras(frase);
+    printf("separar zhiqian %d\n", *tamanho);
+    separarPalavras(frase, vetor, *tamanho);
 
-    printf("%s\n", fraseCopia);
-    // compararPalavras(frase, ficheiroMemoria("word.txt"));
+    // printf("%s\n", fraseCopia);
+    //  compararPalavras(frase, ficheiroMemoria("word.txt"));
 
+    // compararPalavras(frase, vetor, tamanho);
+
+    for (int i = 0; i < *tamanho; i++)
+    {
+        free(vetor[i]);
+    }
+    free(vetor);
     return 0;
 }
+
