@@ -1,24 +1,20 @@
 #include "ortografia.h"
 
-void abrirDicionario(char **words, int *tamanhoDicionario, char nomeficheiro[])
-{
-    FILE *dicionario = fopen(nomeficheiro, "r");
-    if (dicionario == NULL)
+void abrirDicionario(char **words, int *tamanhoDicionario) {
+
+    FILE *ficheiro = fopen("words", "r");
+    if (!ficheiro)
     {
-        printf("Erro ao abrir o dicionário.\n");
-        exit(1);
+        printf("O ficheiro '%s' nao foi encontrado.\n", "words");
+        return;
     }
 
-    // Lê o número de palavras no dicionário
-    fscanf(dicionario, "%d", tamanhoDicionario);
-
-    // Aloca memória para as palavras do dicionário
-    *words = (char **)malloc((*tamanhoDicionario) * sizeof(char *));
-    for (int i = 0; i < *tamanhoDicionario; i++)
+    char palavra[50];
+    while (fscanf(ficheiro, "%s", palavra) == 1)
     {
-        (*words)[i] = (char *)malloc(100 * sizeof(char)); // Aloca espaço para cada palavra
-        fscanf(dicionario, "%s", (*words)[i]); // Lê cada palavra
+        words[*tamanhoDicionario] = (char *)malloc(strlen(palavra) + 1);
+        strcpy(words[*tamanhoDicionario], palavra);
+        (*tamanhoDicionario)++;
     }
-
-    fclose(dicionario);
+    fclose(ficheiro);
 }
