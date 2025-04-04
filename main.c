@@ -2,16 +2,15 @@
 
 
 int main() {
-    int *tamanhoDicionario = (int *)malloc(sizeof(int));
+    int tamanhoDicionario = 0;
     char frase[300];
     char fraseCopia[300];
-    char **words = (char **)malloc(104335 * sizeof(char *));
+    char **words = (char **)malloc(100 * sizeof(char *));
     int numeroLinhas = 0;
     char nomeficheiro[50] = "words";
 
-    *tamanhoDicionario = 0;
 
-    abrirDicionario(words, tamanhoDicionario, nomeficheiro);
+    abrirDicionario(&words, &tamanhoDicionario, nomeficheiro);
 
     while (fgets(frase, sizeof(frase), stdin) != NULL) {
 
@@ -20,14 +19,13 @@ int main() {
             break;
         }
         strcpy(fraseCopia, frase);
-        separarPalavras(frase, words, *tamanhoDicionario, numeroLinhas, fraseCopia);
+        separarPalavras(frase, words, tamanhoDicionario, numeroLinhas, fraseCopia);
     }
     
-    for (int i = 0; i < *tamanhoDicionario; i++) {
+    for (int i = 0; i < tamanhoDicionario; i++) {
         free(words[i]);
     }
     free(words);
-    free(tamanhoDicionario);
     
     return 0;
 }
