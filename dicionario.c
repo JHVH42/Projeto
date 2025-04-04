@@ -10,6 +10,7 @@ void abrirDicionario(char ***words, int *tamanhoDicionario, char nomeficheiro[])
 
     char palavra[50];
     while (fscanf(ficheiro, "%s", palavra) == 1) {
+        //printf("%s %d\n", palavra, *tamanhoDicionario);
         char **temp = (char **)realloc(*words, (*tamanhoDicionario + 1) * sizeof(char *));
         if (temp == NULL) {
             printf("Erro ao alocar memoria.\n");
