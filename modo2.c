@@ -8,13 +8,24 @@ void palavrasAlternativas(char **palavrasErradas, char **words, int nPalavrasErr
 
     for (int i = 0; i < nPalavrasErradas; i++) {
         for (int j = 0; j < TamanhoDicionario; j++) {
-            dicio[j].offset = strcspn(palavrasErradas[i], dicio[j].palavraDoDicio);
+            //int k = 0;
+            int offset = 0;
+
+            for (int k = 0; palavrasErradas[i][k] != '\0' && dicio[j].palavraDoDicio[k] != '\0'; k++) {
+                if (palavrasErradas[i][k] != dicio[j].palavraDoDicio[k]) {
+                    offset++;
+                }
+    
+            }
+            offset += abs(strlen(palavrasErradas[i]) - strlen(dicio[j].palavraDoDicio));
+            dicio[j].offset = offset;
         }
     }
 
-    int offset = 2;
+    int offsetDesejado = 2;
     for (int i = 0; i < TamanhoDicionario; i++) {
-        if (dicio[i].offset == offset) {
+        //printf("%s %d\n", dicio[i].palavraDoDicio, dicio[i].offset);
+        if (dicio[i].offset == offsetDesejado) {
             printf("%s ", dicio[i].palavraDoDicio);
         }
     }

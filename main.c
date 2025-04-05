@@ -4,17 +4,25 @@ int main() {
     int tamanhoDicionario = 0;
     char frase[300];
     char fraseCopia[300];
-    char **words = (char **)malloc(100 * sizeof(char *));
+    char **words = NULL;
     int numeroLinhas = 0;
     char *nomeficheiro = "words";
-    char **palavrasErradas = (char **)malloc(100 * sizeof(char *));
-    
-
-
-    abrirDicionario(&words, &tamanhoDicionario, nomeficheiro);
-    //printf("%d\n", tamanhoDicionario);
+    char **palavrasErradas = NULL;
     int nPalavrasErradas = 0;
-    offsetPalavrasDicio *dicio = malloc(tamanhoDicionario * sizeof(offsetPalavrasDicio));
+    offsetPalavrasDicio *dicio = NULL;
+
+        abrirDicionario(&words, &tamanhoDicionario, nomeficheiro);
+    //printf("%d\n", tamanhoDicionario);
+    if(tamanhoDicionario > 0) {
+        dicio = malloc(tamanhoDicionario * sizeof(offsetPalavrasDicio));
+        if (dicio == NULL) {
+            fprintf(stderr, "Erro ao alocar memoria para decio");
+            return 1;
+        }
+    } else {
+        fprintf(stderr, "Erro: TamanhoDicionario = 0");
+        return 1;
+    }
 
     while (fgets(frase, sizeof(frase), stdin) != NULL) {
 
@@ -31,14 +39,20 @@ int main() {
         printf("%s\n", palavrasErradas[i]);
     }
 
-    palavrasAlternativas(palavrasErradas, words, nPalavrasErradas, dicio, tamanhoDicionario);
+    if (nPalavrasErradas != 0) {
+        palavrasAlternativas(palavrasErradas, words, nPalavrasErradas, dicio, tamanhoDicionario);
+    }
 
     free(dicio);
-    for(int i = 0; i < tamanhoDicionario; i++) {
+    for (int i = 0; i < tamanhoDicionario; i++) {
         free(words[i]);
     }
     free(words);
-    
-    
+
+    for (int i = 0; i < nPalavrasErradas; i++) {
+        free(palavrasErradas[i]);
+    }
+    free(palavrasErradas);
+
     return 0;
 }

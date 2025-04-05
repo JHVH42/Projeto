@@ -45,17 +45,19 @@ int compararPalavras(char palavras[], char **words, int tamanhoDicionario, char 
         //printf("%s %s\n", palavras, words[i]);
         // printf("%s %s\n", palavras, words[1]);
         if (strcasecmp(palavras, words[i]) == 0) {
-
             resultado = TRUE;
             break;
-        } else if (strcasecmp(palavras, words[i]) != 0) {
-            resultado == FALSE;
-            //palavrasErradas[i] = palavras[i];
-            palavrasErradas[i] = (char *)malloc(strlen(palavras) + 1);
-            strcpy(palavrasErradas[i], palavras);
-            //printf("Palavra errada: %s\n", palavras);
-            *nPalavrasErradas++;
         }
+    }
+    if (resultado == FALSE) {
+        // palavrasErradas[i] = palavras[i];
+        *palavrasErradas = realloc(*palavrasErradas, (*nPalavrasErradas + 1) * sizeof(char *));
+
+        (*palavrasErradas)[*nPalavrasErradas] = (char *)malloc(strlen(palavras) + 1);
+
+        strcpy((*palavrasErradas)[*nPalavrasErradas], palavras);
+        (*nPalavrasErradas)++;
+        // printf("Palavra errada: %s\n", palavras);
     }
 
     return resultado;
@@ -66,11 +68,11 @@ int separarPalavras(char frase[], char **words, int tamanhoDicionario, int numer
     char sinalSeparação[] = " -\t\r\n/";
     char *palavras = strtok(frase, sinalSeparação);
     int erro = FALSE;
+
     while (palavras != NULL) {
-    
         formalizarPalavras(palavras); // chama a função para limpar as palavras
         // printf("%s\n", palavras);
-        if (compararPalavras(palavras, words, tamanhoDicionario, &palavrasErradas, &nPalavrasErradas) == 0) {
+        if (compararPalavras(palavras, words, tamanhoDicionario, palavrasErrada, nPalavrasErradas) == FALSE) {
             if (erro == FALSE) {
                 printf("%d: %s", numeroLinhas, fraseCopia);
                 erro = TRUE;
