@@ -156,5 +156,29 @@ int main(int argc, char *argv[]) {
     fclose(ficheiroEntrada);
     fclose(ficheiroSaida);
 
+    for (int i = 0; i < nPalavrasErradas; i++)
+    {
+        free((palavrasErradas)[i]);
+        (palavrasErradas)[i] = NULL;
+    }
+    if (palavrasErradas != NULL)
+    {
+        free(palavrasErradas);
+    }
+
+    if (dicio != NULL)
+    {
+        free(dicio);
+        dicio = NULL;
+    }
+    free(frase);
+    free(fraseCopia);
+
+    for (int i = 0; i < tamanhoDicionario; i++)
+    {
+        free(words[i]);
+    }
+    free(words);
+
     return 0;
 }

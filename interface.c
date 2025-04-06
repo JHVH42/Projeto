@@ -1,7 +1,27 @@
 #include "ortografia.h"
 
-void funcaomodo1(char **words, int tamanhoDicionario, char *dicionario, char *frase, char *fraseCopia, int numeroLinhas, FILE *ficheiroEntrada, int *nPalavrasErradas, char ***palavrasErradas, FILE *ficheiroSaida)
-{
+void funcaomodo1(char **words, int tamanhoDicionario, char *dicionario, char *frase, char *fraseCopia, int numeroLinhas, FILE *ficheiroEntrada, int *nPalavrasErradas, char ***palavrasErradas, FILE *ficheiroSaida, int valorM, offsetPalavrasDicio *dicio, int valorA, int valorN) {
+/*
+    if (ficheiroSaida == NULL) {
+        fprintf(stderr, "Erro ao abrir o ficheiro de saida");
+        return;
+    }
+
+    if (dicionario != NULL) {
+        abrirDicionario(&words, &tamanhoDicionario, dicionario);
+        if (tamanhoDicionario > 0) {
+            dicio = malloc(tamanhoDicionario * sizeof(offsetPalavrasDicio));
+            if (dicio == NULL) {
+                fprintf(stderr, "Erro ao alocar memoria para decio");
+                return;
+            }
+        }
+        else {
+            fprintf(stderr, "Erro: TamanhoDicionario = 0");
+            return;
+        }
+    }
+*/
     size_t tamanhoFrase = 128;
     frase = (char *)malloc(tamanhoFrase * sizeof(char));
     if (frase == NULL) {
@@ -15,9 +35,14 @@ void funcaomodo1(char **words, int tamanhoDicionario, char *dicionario, char *fr
         return;
     }
 
-    while (getline(&frase, &tamanhoFrase, ficheiroEntrada) != -1)
+    while (getline(&frase, &tamanhoFrase, stdin) != -1)
     {
         numeroLinhas++;
+
+        if (strcmp(frase, "\n") == 0) {
+            continue;
+        }
+
         fraseCopia = strdup(frase);
         if (fraseCopia == NULL)
         {
@@ -25,56 +50,39 @@ void funcaomodo1(char **words, int tamanhoDicionario, char *dicionario, char *fr
             free(frase);
             return;
         }
-        if (strcmp(frase, "\n") == 0)
-        {
-            free(fraseCopia);
-            break;
-        }
-        separarPalavras(frase, words, tamanhoDicionario, numeroLinhas, fraseCopia, palavrasErradas, nPalavrasErradas);
+        
+        separarPalavras(frase, words, tamanhoDicionario, numeroLinhas, fraseCopia, palavrasErradas, nPalavrasErradas, valorM, dicio, valorA, valorN);
         free(fraseCopia);
+        fraseCopia = NULL;
     }
-
     
     free(frase);
     frase = NULL;
 }
 
 
-void funcaomodo2(char **words, int tamanhoDicionario, char *dicionario, char *frase, char *fraseCopia, int numeroLinhas, FILE *ficheiroEntrada, int *nPalavrasErradas, char ***palavrasErradas, FILE *ficheiroSaida, offsetPalavrasDicio *dicio, int valorA, int valorN)
-{
-    funcaomodo1(words, tamanhoDicionario, dicionario, frase, fraseCopia, numeroLinhas, ficheiroEntrada, nPalavrasErradas, palavrasErradas, ficheiroSaida);
-    printf("Palavras erradas: %d\n", *nPalavrasErradas);
-    if (nPalavrasErradas != 0)
-    {
-        palavrasAlternativas(*palavrasErradas, words, *nPalavrasErradas, dicio, tamanhoDicionario, valorA, valorN);
-    }
-    for (int i = 0; i < *nPalavrasErradas; i++)
-    {
-        free((*palavrasErradas)[i]);
-        (*palavrasErradas)[i] = NULL;
-    }
-    free(*palavrasErradas);
-    *palavrasErradas = NULL;
+void funcaomodo2(char **words, int tamanhoDicionario, char *dicionario, char *frase, char *fraseCopia, int numeroLinhas, FILE *ficheiroEntrada, int *nPalavrasErradas, char ***palavrasErradas, FILE *ficheiroSaida, int valorM, offsetPalavrasDicio *dicio, int valorA, int valorN) {
 
-    if (dicio != NULL)
-    {
-        free(dicio);
-        dicio = NULL;
+    funcaomodo1(words, tamanhoDicionario, dicionario, frase, fraseCopia, numeroLinhas, ficheiroEntrada, nPalavrasErradas, palavrasErradas, ficheiroSaida, valorM, dicio, valorA, valorN);
+    printf("Palavras erradas: %d\n", *nPalavrasErradas);
+    if (*nPalavrasErradas != 0) {
+        for (int i = 0; i < *nPalavrasErradas; i++) {
+            //printf("%s\n", (*palavrasErradas)[i]);
+            palavrasAlternativas(*palavrasErradas, words, 1, dicio, tamanhoDicionario, valorA, valorN);
+        }
     }
+    
 }
 
 
-void funcaochamafuncao(int valorM, int valorA, int valorN, char **words, int tamanhoDicionario, char *dicionario, char frase[300], char fraseCopia[300], int numeroLinhas, FILE *ficheiroEntrada, int *nPalavrasErradas, offsetPalavrasDicio *dicio, char ***palavrasErradas, FILE *ficheiroSaida)
-{
-    
-
+void funcaochamafuncao(int valorM, int valorA, int valorN, char **words, int tamanhoDicionario, char *dicionario, char frase[300], char fraseCopia[300], int numeroLinhas, FILE *ficheiroEntrada, int *nPalavrasErradas, offsetPalavrasDicio *dicio, char ***palavrasErradas, FILE *ficheiroSaida) {
     switch (valorM)
     {
     case 1:
-        funcaomodo1(words, tamanhoDicionario, dicionario, frase, fraseCopia, numeroLinhas, ficheiroEntrada, nPalavrasErradas, palavrasErradas, ficheiroSaida);
+        funcaomodo1(words, tamanhoDicionario, dicionario, frase, fraseCopia, numeroLinhas, ficheiroEntrada, nPalavrasErradas, palavrasErradas, ficheiroSaida, valorM, dicio, valorA, valorN);
         break;
     case 2:
-        funcaomodo2(words, tamanhoDicionario, dicionario, frase, fraseCopia, numeroLinhas, ficheiroEntrada, nPalavrasErradas, palavrasErradas, ficheiroSaida, dicio, valorA, valorN);
+        funcaomodo2(words, tamanhoDicionario, dicionario, frase, fraseCopia, numeroLinhas, ficheiroEntrada, nPalavrasErradas, palavrasErradas, ficheiroSaida, valorM, dicio, valorA, valorN);
         break;
     case 3:
         //funcaomodo3(valorA, valorN);

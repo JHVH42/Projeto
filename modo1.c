@@ -26,7 +26,7 @@ void formalizarPalavras(char palavras[]) {
         palavras[tamanho - 1] = '\0';
         tamanho--;
     }
-
+/*
     for (int i = 0; palavras[i] != '\0'; i++) {
         // Converte as letras maiusculas para minusculas
         if ((palavras[i] >= 32 && palavras[i] <= 38) || (palavras[i] >= 40 && palavras[i] <= 64) || (palavras[i] >= 91 && palavras[i] <= 96) || (palavras[i] >= 123 && palavras[i] <= 126)) {
@@ -34,6 +34,7 @@ void formalizarPalavras(char palavras[]) {
             tamanho--;
         }
     }
+        */
 }
 
 int compararPalavras(char palavras[], char **words, int tamanhoDicionario, char ***palavrasErradas, int *nPalavrasErradas) {
@@ -65,7 +66,7 @@ int compararPalavras(char palavras[], char **words, int tamanhoDicionario, char 
 }
 
 // Separar as palavras da frase
-int separarPalavras(char frase[], char **words, int tamanhoDicionario, int numeroLinhas, char fraseCopia[], char ***palavrasErrada, int *nPalavrasErradas) {
+int separarPalavras(char frase[], char **words, int tamanhoDicionario, int numeroLinhas, char fraseCopia[], char ***palavrasErrada, int *nPalavrasErradas, int modo, offsetPalavrasDicio *dicio, int valorA, int valorN) {
     char sinalSeparação[] = " -\t\r\n/";
     char *palavras = strtok(frase, sinalSeparação);
     int erro = FALSE;
@@ -79,6 +80,10 @@ int separarPalavras(char frase[], char **words, int tamanhoDicionario, int numer
                 erro = TRUE;
             }
             printf("Erro na palavra \"%s\"\n", palavras);
+
+            if (modo == 2) {
+                palavrasAlternativas(&((*palavrasErrada)[*nPalavrasErradas - 1]), words, 1, dicio, tamanhoDicionario, valorA, valorN);
+            }
         }
         palavras = strtok(NULL, sinalSeparação);
     }
