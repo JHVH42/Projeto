@@ -1,41 +1,54 @@
 #include "ortografia.h"
 
-static int levenshteinDistance(const char *s1, const char *s2)
+static int levenshteinDistanceOptimized(const char *s1, const char *s2, int maxThreshold)
 {
     int len1 = strlen(s1);
     int len2 = strlen(s2);
 
-    // 创建 DP 数组
+    if (len1 == 0)
+        return len2;
+    if (len2 == 0)
+        return len1;
+
     int *prev = (int *)malloc((len2 + 1) * sizeof(int));
     int *curr = (int *)malloc((len2 + 1) * sizeof(int));
-
     if (!prev || !curr)
     {
-        fprintf(stderr, "Erro ao alocar memoria para Levenshtein\n");
+        fprintf(stderr, "Erro ao alocar memoria\n");
         free(prev);
         free(curr);
-        return len1 > len2 ? len1 : len2; // 应急返回一个较大值
+        return len1 > len2 ? len1 : len2;
     }
 
-    // 初始化第一行
     for (int j = 0; j <= len2; j++)
-    {
         prev[j] = j;
-    }
 
-    // 填充 DP
     for (int i = 1; i <= len1; i++)
     {
         curr[0] = i;
+        int minInRow = curr[0];
+
         for (int j = 1; j <= len2; j++)
         {
-            int cost = (s1[i - 1] == s2[j - 1]) ? 0 : 1;
+            int cost = s1[i - 1] != s2[j - 1];
             int del = prev[j] + 1;
             int ins = curr[j - 1] + 1;
             int rep = prev[j - 1] + cost;
-            curr[j] = (del < ins ? (del < rep ? del : rep) : (ins < rep ? ins : rep));
+
+            curr[j] = del < ins ? (del < rep ? del : rep) : (ins < rep ? ins : rep);
+
+            if (curr[j] < minInRow)
+                minInRow = curr[j];
         }
-        // 交换 row
+
+        // Early termination: if the smallest edit is already > threshold
+        if (maxThreshold >= 0 && minInRow > maxThreshold)
+        {
+            free(prev);
+            free(curr);
+            return maxThreshold + 1;
+        }
+
         int *temp = prev;
         prev = curr;
         curr = temp;
@@ -59,7 +72,7 @@ void palavrasAlternativas(char **palavrasErradas, char **words, int nPalavrasErr
         for (int j = 0; j < TamanhoDicionario; j++) {
             dicio[j].offset = 0; }
             for (int j = 0; j < TamanhoDicionario; j++){
-                int offset = levenshteinDistance(palavrasErradas[i], dicio[j].palavraDoDicio);
+                int offset = levenshteinDistanceOptimized(palavrasErradas[i], dicio[j].palavraDoDicio, offsetDesejado);
                 dicio[j].offset = offset;
             }
             
@@ -76,14 +89,18 @@ void palavrasAlternativas(char **palavrasErradas, char **words, int nPalavrasErr
             int count = 0;
             for (int j = 0; j < TamanhoDicionario; j++){
                 if (dicio[j].offset <= offsetDesejado) {
-                    printf("%s %d ", dicio[j].palavraDoDicio, dicio[j].offset);
-
-                    count++;
+                    if (count == maximoAlternativas - 1) {
+                        printf("%s", dicio[j].palavraDoDicio);
+                    } else {
+                        printf("%s, ", dicio[j].palavraDoDicio);
+                    }
                 }
-                if (count >= maximoAlternativas) {
-                    break;
-                }
+                count++;
+            
+            if (count >= maximoAlternativas) {
+                break;
             }
         }
+    }
         printf("\n");
 }
