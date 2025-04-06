@@ -49,16 +49,17 @@ int compararPalavras(char palavras[], char **words, int tamanhoDicionario, char 
             break;
         }
     }
-    if (resultado == FALSE) {
-        // palavrasErradas[i] = palavras[i];
-        *palavrasErradas = realloc(*palavrasErradas, (*nPalavrasErradas + 1) * sizeof(char *));
+    
+        if (resultado == FALSE) {
+            *palavrasErradas = realloc(*palavrasErradas, (*nPalavrasErradas + 1) * sizeof(char *));
 
-        (*palavrasErradas)[*nPalavrasErradas] = (char *)malloc(strlen(palavras) + 1);
+            (*palavrasErradas)[*nPalavrasErradas] = (char *)malloc(strlen(palavras) + 1);
 
-        strcpy((*palavrasErradas)[*nPalavrasErradas], palavras);
-        (*nPalavrasErradas)++;
-        // printf("Palavra errada: %s\n", palavras);
-    }
+            strcpy((*palavrasErradas)[*nPalavrasErradas], palavras);
+            (*nPalavrasErradas)++;
+            //printf("Palavra errada: %s\n", palavras);
+        }
+    
 
     return resultado;
 }
